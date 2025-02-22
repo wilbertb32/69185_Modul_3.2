@@ -22,12 +22,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.theme.RallyTheme
 import androidx.navigation.compose.rememberNavController
@@ -36,7 +39,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.compose.runtime.getValue
+import com.example.compose.rally.ui.overview.OverviewScreen
+import com.example.compose.rally.ui.accounts.AccountsScreen
+import com.example.compose.rally.ui.bills.BillsScreen
 
 /**
  * This Activity recreates part of the Rally Material Study from
@@ -48,6 +53,18 @@ class RallyActivity : ComponentActivity() {
         setContent {
             RallyApp()
         }
+    }
+    interface RallyDestination {
+        val icon: ImageVector
+        val route: String
+    }
+
+    /**
+     * Rally app navigation destinations
+     */
+    object Overview : RallyDestination {
+        override val icon = Icons.Filled.PieChart
+        override val route = "overview"
     }
 }
 
@@ -83,14 +100,23 @@ fun RallyApp() {
                     currentScreen = currentScreen,
                 )
             }
-        ) { innerPadding ->
+        )
+
+        { innerPadding ->
             NavHost(
                 navController = navController,
                 startDestination = Overview.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable(route = Overview.route) {
-                    Overview.screen()
+                    OverviewScreen(
+                        onClickSeeAllAccounts = {
+                            navController.navigateSingleTopTo(Accounts.route)
+                        },
+                        onClickSeeAllBills = {
+                            navController.navigateSingleTopTo(Bills.route)
+                        }
+                    )
                 }
                 composable(route = Accounts.route) {
                     Accounts.screen()
