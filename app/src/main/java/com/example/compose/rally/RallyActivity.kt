@@ -40,6 +40,7 @@ import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.bills.BillsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.data.UserData
+import androidx.navigation.navDeepLink
 
 /**
  * This Activity recreates part of the Rally Material Study from
@@ -125,7 +126,8 @@ fun RallyApp() {
                 }
                 composable(
                     route = SingleAccount.routeWithArgs,
-                    arguments = SingleAccount.arguments
+                    arguments = SingleAccount.arguments,
+                    deepLinks = SingleAccount.deepLinks
                 ) { navBackStackEntry ->
                     val accountType =
                         navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
