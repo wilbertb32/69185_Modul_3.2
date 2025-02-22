@@ -42,6 +42,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.compose.rally.ui.overview.OverviewScreen
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.bills.BillsScreen
+import com.example.compose.rally.ui.accounts.SingleAccountScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.compose.rally.data.UserData
 
 /**
  * This Activity recreates part of the Rally Material Study from
@@ -108,15 +112,16 @@ fun RallyApp() {
                 startDestination = Overview.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable(route = Overview.route) {
-                    OverviewScreen(
-                        onClickSeeAllAccounts = {
-                            navController.navigateSingleTopTo(Accounts.route)
-                        },
-                        onClickSeeAllBills = {
-                            navController.navigateSingleTopTo(Bills.route)
-                        }
-                    )
+                composable(
+                    route = SingleAccount.routeWithArgs,
+                    arguments = SingleAccount.arguments
+                ) { navBackStackEntry ->
+                    // Retrieve the passed argument
+                    val accountType =
+                        navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+
+                    // Pass accountType to SingleAccountScreen
+                    SingleAccountScreen(accountType)
                 }
                 composable(route = Accounts.route) {
                     Accounts.screen()
@@ -125,6 +130,20 @@ fun RallyApp() {
                     Bills.screen()
                 }
             }
+            OverviewScreen(
+                // ...
+                onAccountClick = { accountType ->
+                    navController
+                        .navigateSingleTopTo("${SingleAccount.route}/$accountType")
+                }
+            )
+            AccountsScreen(
+                // ...
+                onAccountClick = { accountType ->
+                    navController
+                        .navigateSingleTopTo("${SingleAccount.route}/$accountType")
+                }
+            )
             Box(Modifier.padding(innerPadding)) {
                 currentScreen.screen()
             }
@@ -132,3 +151,13 @@ fun RallyApp() {
     }
 }
 
+@Composable
+fun SingleAccountScreen(
+    accountType: String? = UserData.accounts.first().name
+) {
+    // ...
+}
+
+private fun NavHostController.navigateToSingleAccount(accountType: String) {
+    this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
+}
