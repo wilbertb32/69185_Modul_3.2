@@ -33,6 +33,10 @@ import com.example.compose.rally.ui.theme.RallyTheme
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.NavHostController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.runtime.getValue
 
 /**
  * This Activity recreates part of the Rally Material Study from
@@ -47,17 +51,36 @@ class RallyActivity : ComponentActivity() {
     }
 }
 
+fun NavHostController.navigateSingleTopTo(route: String) =
+    this.navigate(route) {
+        popUpTo(
+            this@navigateSingleTopTo.graph.findStartDestination().id
+        ) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+
 @Composable
 fun RallyApp() {
     RallyTheme {
-        var currentScreen: RallyDestination by remember { mutableStateOf(Overview) }
         val navController = rememberNavController()
+
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentDestination = currentBackStack?.destination
+
+        // Change the variable to this and use Overview as a backup screen if this returns null
+        val currentScreen = rallyTabRowScreens.find { it.route == currentDestination?.route } ?: Accounts
         Scaffold(
             topBar = {
                 RallyTabRow(
                     allScreens = rallyTabRowScreens,
-                    onTabSelected = { screen -> currentScreen = screen },
-                    currentScreen = currentScreen
+                    onTabSelected = { newScreen ->
+                        navController
+                            .navigateSingleTopTo(newScreen.route)
+                    },
+                    currentScreen = currentScreen,
                 )
             }
         ) { innerPadding ->
@@ -82,3 +105,4 @@ fun RallyApp() {
         }
     }
 }
+
